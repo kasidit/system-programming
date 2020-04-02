@@ -22,16 +22,16 @@ int main(void){
    void *tret; 
 
    pthread_mutex_init(&mutex_var, NULL); 
-    
+   pthread_mutex_lock(&mutex_var); 
+
    pthread_create(&ntid, NULL, foo, NULL);  
    pthread_detach(ntid); 
    printf("main thread do something \n"); 
 
    //pthread_join(ntid, tret); 
-   pthread_mutex_lock(&mutex_var); 
    printf("main thread wait here...\n"); 
    pthread_mutex_lock(&mutex_var); 
-   printf("main thread enters critical section and leave...\n"); 
    pthread_mutex_unlock(&mutex_var); 
+   printf("main thread continue...\n"); 
 
 }

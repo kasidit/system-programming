@@ -11,8 +11,7 @@ struct node {
 
 #define TABLE_SIZE 5
 struct node * table[TABLE_SIZE]; 
-
-//pthread_mutex_t mutexT; 
+pthread_mutex_t mutexT; 
 
 // initialize data
 struct node * create_node(int id){
@@ -54,6 +53,8 @@ void Add_data(int id){
 void Find_and_add_data(int id){
   int i; 
   struct node * ptr; 
+  pthread_mutex_lock(&mutexT); 
+  sleep(2);
   for(i = 0; i < TABLE_SIZE; i++){
     ptr = table[i]; 
     if((ptr != NULL)&&(ptr->id == id)){
@@ -62,19 +63,25 @@ void Find_and_add_data(int id){
       break;
     }
   }
+  pthread_mutex_unlock(&mutexT); 
 }
 
 // delete data and free node 
-void Release_data(int id){
+void Release_data_may_deadlock(int id){
   struct node * ptr = table[id]; 
   pthread_mutex_lock(&(ptr->mutex));  
-  (ptr->data)--; 
-  if((ptr->data) == 0){
+  sleep(2);
+  if((ptr->data) == 1){
+    (ptr->data)--; 
+    pthread_mutex_lock(&mutexT);  
+    table[id] = NULL;
+    pthread_mutex_unlock(&mutexT);  
     pthread_mutex_unlock(&(ptr->mutex));  
     pthread_mutex_destroy(&(ptr->mutex));  
     free(ptr);
   }
   else{
+    (ptr->data)--; 
     pthread_mutex_unlock(&(ptr->mutex));  
   }
 }
@@ -82,20 +89,14 @@ void Release_data(int id){
 // processing
 
 void * t1(void * arg){
-   Find_and_add_data(1); 
-   sleep(2);
+   Find_and_add_data(2); 
+   //sleep(1);
    pthread_exit((void *)NULL); 
 }
 
 void * t2(void * arg){
-   Find_and_add_data(1); 
-   sleep(2);
-   pthread_exit((void *)NULL); 
-}
-
-void * t3(void * arg){
-   Find_and_add_data(4); 
-   sleep(2);
+   Find_and_add_data(2); 
+   //sleep(1);
    pthread_exit((void *)NULL); 
 }
 
@@ -106,18 +107,14 @@ int main(void){
    pthread_t ntid[NUM_THREADS];
 
    init_data(); 
-
    print_nodes();
-  //pthread_mutex_init(&mutexT, NULL); 
+   pthread_mutex_init(&mutexT, NULL); 
     
    pthread_create(&ntid[0], NULL, t1, (void *)NULL);  
    pthread_create(&ntid[1], NULL, t2, (void *)NULL);  
-   pthread_create(&ntid[2], NULL, t3, (void *)NULL);  
-
 
    pthread_join(ntid[0], NULL);
    pthread_join(ntid[1], NULL);
-   pthread_join(ntid[2], NULL);
    printf("summary\n");
    print_nodes();
 }

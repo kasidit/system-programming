@@ -83,22 +83,19 @@ void Release_data(int id){
 
 void * t1(void * arg){
    Release_data(3); 
-   //sleep(1);
-   Find_and_add_data(4); 
+   sleep(2);
    pthread_exit((void *)NULL); 
 }
 
 void * t2(void * arg){
    Release_data(3); 
-   //sleep(1);
-   Find_and_add_data(2); 
+   sleep(2);
    pthread_exit((void *)NULL); 
 }
 
 void * t3(void * arg){
    Release_data(3); 
-   //sleep(1);
-   Find_and_add_data(1); 
+   sleep(2);
    pthread_exit((void *)NULL); 
 }
 

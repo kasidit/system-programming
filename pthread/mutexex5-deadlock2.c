@@ -13,6 +13,8 @@ void * t(void * arg){
    
    if(id == 1){
      pthread_mutex_lock(&v1); 
+     sleep(1);
+     printf("before enter csection of t(1)\n"); 
      pthread_mutex_lock(&v2); 
      printf("enter critical section of t(1)\n"); 
      pthread_mutex_unlock(&v2); 
@@ -20,6 +22,8 @@ void * t(void * arg){
    }
    else if(id == 2){
      pthread_mutex_lock(&v2); 
+     sleep(1);
+     printf("before enter csection of t(2)\n"); 
      pthread_mutex_lock(&v1); 
      printf("enter critical section of t(2)\n"); 
      pthread_mutex_unlock(&v1); 

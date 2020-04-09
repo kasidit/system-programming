@@ -8,7 +8,6 @@ pthread_cond_t cv;
 int global_var = 0; 
 
 void * foo(void * arg){
-
    sleep(3);
    pthread_mutex_lock(&mutex_var);  
    global_var ++;

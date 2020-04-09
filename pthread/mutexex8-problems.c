@@ -44,29 +44,25 @@ void print_nodes(void){
 }
 
 // add data 
-void Add_data(int id){
-  struct node * ptr = table[id]; 
+void Add_data(struct node * ptr){ 
   pthread_mutex_lock(&(ptr->mutex));  
   (ptr->data)++; 
   pthread_mutex_unlock(&(ptr->mutex));  
 }
 
 void Find_and_add_data(int id){
-  int i; 
   struct node * ptr; 
-  for(i = 0; i < TABLE_SIZE; i++){
-    ptr = table[i]; 
-    if((ptr != NULL)&&(ptr->id == id)){
-      Add_data(id);
-      printf("table id= %d data= %d added\n", ptr->id, ptr->data);
-      break;
-    }
+  ptr = table[id]; 
+  if(ptr != NULL){
+    Add_data(ptr);
+    printf("table id= %d data= %d added\n", ptr->id, ptr->data);
   }
 }
 
 // delete data and free node 
 void Release_data(int id){
-  struct node * ptr = table[id]; 
+  struct node * ptr; 
+  ptr = table[id]; 
   pthread_mutex_lock(&(ptr->mutex));  
   (ptr->data)--; 
   if((ptr->data) == 0){

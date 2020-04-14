@@ -73,7 +73,13 @@ void Release_data_safe(int id){
   sleep(2);
   if((ptr->data) == 1){
     pthread_mutex_unlock(&(ptr->mutex));  
+
     pthread_mutex_lock(&mutexT);
+    ptr = table[id]; 
+    if(ptr == NULL){ 
+      pthread_mutex_unlock(&mutexT);
+      return; 
+    }
     pthread_mutex_lock(&(ptr->mutex));  
     if((ptr->data) != 1){
       (ptr->data)--; 

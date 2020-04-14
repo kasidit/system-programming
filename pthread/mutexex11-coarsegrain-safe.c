@@ -62,11 +62,16 @@ void Release_data_safe(int id){
   struct node * ptr; 
   pthread_mutex_lock(&mutexT); 
   ptr = table[id]; 
+  pthread_mutex_unlock(&mutexT);  
+
+  if(ptr == NULL) return;
+
+  pthread_mutex_lock(&mutexT); 
   if((ptr->data) == 1){
     (ptr->data)--; 
     table[id] = NULL;
-    pthread_mutex_unlock(&mutexT);  
     free(ptr);
+    pthread_mutex_unlock(&mutexT);  
   }
   else{
     (ptr->data)--; 

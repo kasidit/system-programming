@@ -68,11 +68,11 @@ void Release_data_safe(int id){
   ptr = table[id]; 
   pthread_mutex_unlock(&mutexT); 
 
+  if(ptr == NULL) return; 
   pthread_mutex_lock(&(ptr->mutex));  
   sleep(2);
   if((ptr->data) == 1){
     pthread_mutex_unlock(&(ptr->mutex));  
-
     pthread_mutex_lock(&mutexT);
     pthread_mutex_lock(&(ptr->mutex));  
     if((ptr->data) != 1){
@@ -87,8 +87,7 @@ void Release_data_safe(int id){
     pthread_mutex_destroy(&(ptr->mutex));  
     free(ptr);
   }
-  else{
-    (ptr->data)--; 
+  else{ (ptr->data)--; 
     pthread_mutex_unlock(&(ptr->mutex));  
   }
 }

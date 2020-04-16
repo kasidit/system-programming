@@ -48,7 +48,7 @@ int en_Q(int data){ // enqueue the queue
    printf("Q[t%02d]Ql=%d <-- %d\n", Q_tail, Q_len, data); 
    Q_tail = (Q_tail + 1) % Q_SIZE; 
    Q_len++;
-   pthread_cond_signal(&not_empty); 
+   pthread_cond_broadcast(&not_empty); 
    pthread_mutex_unlock(&mutexQ);  
    return data;
 }
@@ -67,7 +67,7 @@ int de_Q(void){ // dequeue the queue
    Q_head = (Q_head + 1) % Q_SIZE; 
    Q_len--;
 
-   pthread_cond_signal(&not_full); 
+   pthread_cond_broadcast(&not_full); 
    pthread_mutex_unlock(&mutexQ);  
    return data;
 }

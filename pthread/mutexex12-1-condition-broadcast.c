@@ -31,7 +31,7 @@ void * bar(void * arg){
    pthread_mutex_lock(&mutex_var);  
    global_var ++;
    printf("bar() update global_var to %d\n", global_var); 
-   pthread_cond_signal(&cv);
+   pthread_cond_broadcast(&cv);
    pthread_mutex_unlock(&mutex_var);  
 
    pthread_exit((void *)NULL); 

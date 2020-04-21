@@ -57,7 +57,7 @@ int de_Q(void){ // dequeue the queue
    int data;
    pthread_mutex_lock(&mutexQ);  
 
-   while(Q_len == 0){ // the Q is full.
+   while(Q_len == 0){ // the Q is empty.
      print_Q("E:");
      pthread_cond_wait(&not_empty, &mutexQ); 
    }

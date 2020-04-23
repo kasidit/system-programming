@@ -1,5 +1,5 @@
 /*
- A simple TCP client program 
+ A simple echo server program 
  Kasidit Chanchio (kasiditchanchio@gmail.com)
 */
 #include <stdlib.h>
@@ -20,77 +20,55 @@
 #define SERV_IP		"127.0.0.1"
 #define SERV_PORT 	18800
 
-#define	MAXLINE	100
+#define MAXLINE	100
 
-int client_shutdown_flag = 0;
+#include <signal.h>
 
+static void handler(int sig){
+     printf("Sig = %d\n", sig);
+     fflush(stdout);
+}
+
+int lis_fd;
 int conn_fd;
 struct sockaddr_in serv_addr;
 
-main(int argc, char *argv[]){
+int main(int argc, char *argv[]){
 
-        int n, m;
-	fd_set base_rfds, rfds; 
-        int fdmax = 0; 
+        int m, n;
         char line[MAXLINE];
 
-	conn_fd = socket(AF_INET, SOCK_STREAM, 0); 
+        if(signal(SIGINT, handler) == SIG_ERR){
+		exit(1);
+	}
+
+	lis_fd = socket(AF_INET, SOCK_STREAM, 0); 
 
 	memset(&serv_addr, 0, sizeof(serv_addr));
 	serv_addr.sin_family = AF_INET;
 	serv_addr.sin_port = htons(SERV_PORT);
 	
-	serv_addr.sin_addr.s_addr = inet_addr(SERV_IP);
+	serv_addr.sin_addr.s_addr = INADDR_ANY;
 
-        if (connect(conn_fd, (struct sockaddr *) &serv_addr, sizeof(serv_addr))<0) { 
-            perror("Problem in connecting to the server");
-            exit(3);
+	bind(lis_fd, (struct sockaddr *) &serv_addr, sizeof(serv_addr)); 
+
+	listen(lis_fd, 5);
+
+	if((conn_fd = accept_cr(lis_fd, NULL, NULL)) < 0){
+		printf("Accept: Error occured\n");
+		exit(1);
+	}
+
+	while ((n = read_full(conn_fd, line, MAXLINE)) != 0){
+                printf("line = %s with n = %d characters\n", line, n);
+                fflush(stdout);
+                m = write(conn_fd, line, n);
+                printf("write line = %s for m = %d characters\n", line, m);
+                fflush(stdout);
         }
 
-	FD_ZERO(&base_rfds);
-	FD_ZERO(&rfds);
-	FD_SET(fileno(stdin), &base_rfds);
-	FD_SET(conn_fd, &base_rfds);
-
-	fdmax = conn_fd;
-
-	while(1){
-	  memcpy(&rfds, &base_rfds, sizeof(fd_set)); // copy it
-          if (select(fdmax+1, &rfds, NULL, NULL, NULL) == -1) {
-            perror("select");
-            exit(4);
-          }
-	  
-	  if(FD_ISSET(fileno(stdin), &rfds)){
-            if(fgets(line, MAXLINE, stdin) == NULL){
-	      printf("Shutdown writing to TCP connection\n");
-	      shutdown(conn_fd, SHUT_WR);
-	      client_shutdown_flag = 1;
-	    }
-	    else{
-              n = write(conn_fd, line, MAXLINE);
-              printf("send %s with n = %d characters\n", line, n);
-	    }
-	  }
-
-	  if(FD_ISSET(conn_fd, &rfds)){
-            if(read(conn_fd, line, MAXLINE) == NULL){
-	      if(client_shutdown_flag){
-	        printf("TCP connection closed after client shutdown\n");
-	        close(conn_fd);
-	        break;
-	      }
-	      else{
-	        printf("Error: TCP connection closed unexpectedly\n");
-	        exit(1);
-	      }
-	    }
-	    else{
-              printf("receive %s with m = %d characters\n", line, m);
-              fputs(line, stdout);
-	    }
-	  }
-	}
+	close(conn_fd);
+	close(lis_fd);
 
 }
 
@@ -141,6 +119,7 @@ int read_full(int fd, void *buf, size_t count){
         ret = read(fd, buf, count);
         if (ret < 0) {
             if (errno == EINTR){ 
+	        printf("read INTERRUPTED! %d\n", errno);
                 continue;
 	    } 
 	    printf("read error errno=%d fd=%d\n", errno, fd);
@@ -157,4 +136,3 @@ int read_full(int fd, void *buf, size_t count){
 
     return total;
 }
-

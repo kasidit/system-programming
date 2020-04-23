@@ -1,5 +1,5 @@
 /*
- A simple echo server program 
+ A simple TCP client program 
  Kasidit Chanchio (kasiditchanchio@gmail.com)
 */
 #include <stdlib.h>
@@ -20,37 +20,52 @@
 #define SERV_IP		"127.0.0.1"
 #define SERV_PORT 	18800
 
-#define MAXLINE	100
+#define	MAXLINE	100
 
 #include <signal.h>
 
-int sockfd;
-struct sockaddr_in serv_addr, cli_addr;
+static void handler(int sig){
+   printf("signal received %d\n", sig);
+   fflush(stdout);
+}
 
-main(int argc, char *argv[]){
+int conn_fd;
+struct sockaddr_in serv_addr;
 
-        int m, n;
+int main(int argc, char *argv[]){
+
+        int n, m;
         char line[MAXLINE];
 
-	sockfd = socket(AF_INET, SOCK_DGRAM, 0); 
+	if(signal(SIGINT, handler) == SIG_ERR){
+	    exit(1);
+	}
+
+	conn_fd = socket(AF_INET, SOCK_STREAM, 0); 
 
 	memset(&serv_addr, 0, sizeof(serv_addr));
 	serv_addr.sin_family = AF_INET;
 	serv_addr.sin_port = htons(SERV_PORT);
-	serv_addr.sin_addr.s_addr = INADDR_ANY;
-	bind(sockfd, (struct sockaddr *) &serv_addr, sizeof(serv_addr)); 
+	
+	serv_addr.sin_addr.s_addr = inet_addr(SERV_IP);
 
-        for(;;){
-          int len = sizeof(cli_addr);
-          n = recvfrom(sockfd, line, MAXLINE, 0, (struct sockaddr *)&cli_addr, &len);
-          printf("line = %s with n = %d characters\n", line, n);
-          fflush(stdout);
-        //if(strncmp(line, "ENDOFMESSAGE", sizeof("ENDOFMESSAGE")) ==0)
-	//	break;
-          n = sendto(sockfd, line, n, 0, (struct sockaddr *)&cli_addr, sizeof(cli_addr));
+        if (connect(conn_fd, (struct sockaddr *) &serv_addr, sizeof(serv_addr))<0) { 
+            perror("Problem in connecting to the server");
+            exit(3);
+        }
+
+        while (fgets(line, MAXLINE, stdin) != NULL) {
+
+            n = write_full(conn_fd, line, MAXLINE);
+            printf("send %s with n = %d characters\n", line, n);
+            m = read_full(conn_fd, line, MAXLINE);
+            printf("receive %s with m = %d characters\n", line, m);
+
+            fputs(line, stdout);
 
         }
-	close(sockfd);
+
+	close(conn_fd);
 
 }
 
@@ -101,7 +116,6 @@ int read_full(int fd, void *buf, size_t count){
         ret = read(fd, buf, count);
         if (ret < 0) {
             if (errno == EINTR){ 
-	        printf("read INTERRUPTED! %d\n", errno);
                 continue;
 	    } 
 	    printf("read error errno=%d fd=%d\n", errno, fd);
@@ -118,3 +132,4 @@ int read_full(int fd, void *buf, size_t count){
 
     return total;
 }
+

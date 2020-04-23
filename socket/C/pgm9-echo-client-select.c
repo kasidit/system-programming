@@ -22,24 +22,21 @@
 
 #define	MAXLINE	100
 
-#include <signal.h>
+int accept_cr(int fd, struct sockaddr *addr, socklen_t *len);
+int write_full(int fd, const void *buf, size_t count);
+int read_full(int fd, void *buf, size_t count);
 
-static void handler(int sig){
-   printf("signal received %d\n", sig);
-   fflush(stdout);
-}
+int client_shutdown_flag = 0;
 
 int conn_fd;
 struct sockaddr_in serv_addr;
 
-main(int argc, char *argv[]){
+int main(int argc, char *argv[]){
 
         int n, m;
+	fd_set base_rfds, rfds; 
+        int fdmax = 0; 
         char line[MAXLINE];
-
-	if(signal(SIGINT, handler) == SIG_ERR){
-	    exit(1);
-	}
 
 	conn_fd = socket(AF_INET, SOCK_STREAM, 0); 
 
@@ -54,19 +51,50 @@ main(int argc, char *argv[]){
             exit(3);
         }
 
-        while (fgets(line, MAXLINE, stdin) != NULL) {
+	FD_ZERO(&base_rfds);
+	FD_ZERO(&rfds);
+	FD_SET(fileno(stdin), &base_rfds);
+	FD_SET(conn_fd, &base_rfds);
 
-            n = write(conn_fd, line, MAXLINE);
-            printf("send %s with n = %d characters\n", line, n);
-            m = read(conn_fd, line, MAXLINE);
-            printf("receive %s with m = %d characters\n", line, m);
+	fdmax = conn_fd;
 
-            fputs(line, stdout);
+	while(1){
+	  memcpy(&rfds, &base_rfds, sizeof(fd_set)); // copy it
+          if (select(fdmax+1, &rfds, NULL, NULL, NULL) == -1) {
+            perror("select");
+            exit(4);
+          }
+	  
+	  if(FD_ISSET(fileno(stdin), &rfds)){
+            if(fgets(line, MAXLINE, stdin) == NULL){
+	      printf("Shutdown writing to TCP connection\n");
+	      shutdown(conn_fd, SHUT_WR);
+	      client_shutdown_flag = 1;
+	    }
+	    else{
+              n = write_full(conn_fd, line, MAXLINE);
+              printf("send %s with n = %d characters\n", line, n);
+	    }
+	  }
 
-        }
-
-	close(conn_fd);
-
+	  if(FD_ISSET(conn_fd, &rfds)){
+            if(read_full(conn_fd, line, MAXLINE) == 0){
+	      if(client_shutdown_flag){
+	        printf("TCP connection closed after client shutdown\n");
+	        close(conn_fd);
+	        break;
+	      }
+	      else{
+	        printf("Error: TCP connection closed unexpectedly\n");
+	        exit(1);
+	      }
+	    }
+	    else{
+              printf("receive %s with m = %d characters\n", line, m);
+              fputs(line, stdout);
+	    }
+	  }
+	}
 }
 
 // -----Basic Communication Utilities-----

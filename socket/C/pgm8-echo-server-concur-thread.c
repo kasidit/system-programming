@@ -4,29 +4,24 @@
 */
 #include <stdlib.h>
 #include <stdio.h>
-
 #include <string.h>
 #include <errno.h>
 #include <unistd.h>
 #include <stdint.h>
 #include <inttypes.h>
 #include <fcntl.h>
-
 #include <sys/types.h>
 #include <sys/socket.h>
-
 #include <sys/wait.h>
-
 #include <netinet/in.h>
 #include <arpa/inet.h>
 
+#include <pthread.h>
+
 #define SERV_IP		"127.0.0.1"
 #define SERV_PORT 	18800
-
 #define MAXLINE	100
 #define MAX_CONNECTIONS	100
-
-#include <pthread.h>
 
 int lis_fd;
 int conn_fd[MAX_CONNECTIONS];

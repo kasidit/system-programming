@@ -1,0 +1,7 @@
+fruit unit_price amount staff
+orange  50  20 somchai
+banana  100 7 natty
+apple  200  30  somnuk
+mango  60   20   alice
+apple  130  100 bob
+orange  10  3000 john

@@ -1,1 +1,0 @@
-#define CONSTANT1 100

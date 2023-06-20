@@ -2,7 +2,7 @@
 
 ## ศึกษา Duff's Device
 <p>
-ให้ นศ ศึกษา duff device ที่ <a href="http://www.lysator.liu.se/c/duffs-device.html">reference [1]</a> ข้างล่าง แล้วพิจารณาว่าทำไม  เTom Duff จึงเปลี่ยน โค๊ด จาก 
+ให้ นศ ศึกษา duff device ที่ <a href="http://www.lysator.liu.se/c/duffs-device.html">reference [1]</a> ข้างล่าง แล้วพิจารณาว่าทำไม  Tom Duff จึงเปลี่ยน โค๊ด จาก 
 <pre>
 	send(to, from, count)
 	register short *to, *from;
@@ -33,9 +33,9 @@
 		}
 	}
 </pre>
-ได้ ในโปรแกรมนี้ขึ้นขึ้นเพื่อ copy ค่าจาก array ของ short ไปยังรีจิสเตอร์ของ Programmed IO data register of an Evans & Sutherland Picture System II 
+ได้ ในโปรแกรมนี้ขึ้นขึ้นเพื่อ copy ค่าจาก array ของ short ไปยังรีจิสเตอร์ของ Programmed IO data register ของเครื่องคอมพิวเตอร์ Evans & Sutherland Picture System II 
 <p>
-ใน code src/duff/duff.c ผมได้แปลงให้เป็นการก็อปปี้ค่า array ของ characters จาก array *from ไปยัง *to คือให้เปลี่ยนจาก 
+ใน code <href="https://github.com/kasidit/system-programming/blob/master/src/duff/duff.c">src/duff/duff.c</href>a> ผมได้แปลงให้เป็นการก็อปปี้ค่า array ของ characters จาก array *from ไปยัง *to คือให้เปลี่ยนจาก 
 <pre>
 	do
 		*to++ = *from++;

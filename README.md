@@ -35,7 +35,7 @@
 </pre>
 ได้ ในโปรแกรมนี้ขึ้นขึ้นเพื่อ copy ค่าจาก array ของ short ไปยังรีจิสเตอร์ของ Programmed IO data register ของเครื่องคอมพิวเตอร์ Evans & Sutherland Picture System II 
 <p>
-ใน code <href="https://github.com/kasidit/system-programming/blob/master/src/duff/duff.c">src/duff/duff.c</href>a> ผมได้แปลงให้เป็นการก็อปปี้ค่า array ของ characters จาก array *from ไปยัง *to คือให้เปลี่ยนจาก 
+ใน code <a href="https://github.com/kasidit/system-programming/blob/master/src/duff/duff.c">src/duff/duff.c</a> ผมได้แปลงให้เป็นการก็อปปี้ค่า array ของ characters จาก array *from ไปยัง *to คือให้เปลี่ยนจาก 
 <pre>
 	do
 		*to++ = *from++;

@@ -1,5 +1,10 @@
 # system-programming
 
+## CS435 Solutions
+<p>
+เฉลย Assignments วิชา CS435 
+<p>
+
 ## ศึกษา Duff's Device
 <p>
 ให้ นศ ศึกษา duff device ที่ <a href="http://www.lysator.liu.se/c/duffs-device.html">reference [1]</a> ข้างล่าง แล้วพิจารณาว่าทำไม  Tom Duff จึงเปลี่ยน โค๊ด จาก 
